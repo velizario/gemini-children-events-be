@@ -1,74 +1,122 @@
 // prisma/schema.prisma
+
+// Define the Prisma Client generator
 generator client {
   provider = "prisma-client-js"
 }
 
+// Define the database connection (Datasource)
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql" // Specify your database provider
+  url      = env("DATABASE_URL") // Get the connection URL from .env file
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  firstName String?
-  lastName  String?
-  role      Role     @default(PARENT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  // Organizer specific fields (can be added later or use a separate profile model)
-  organizerInfo OrganizerProfile?
-  // Parent specific fields (if needed)
-  registrations Registration[]
-  // Events created by this user (if organizer)
-  organizedEvents Event[] @relation("OrganizerEvents")
+// --- MODEL DEFINITIONS BELOW ---
 
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  password        String
+  firstName       String?
+  lastName        String?
+  role            Role     @default(PARENT)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organizerInfo   OrganizerProfile?
+  registrations   Registration[]
+  organizedEvents Event[]           @relation("OrganizerEvents")
+  reviewsWritten  Review[]          @relation("UserReviews")
+
+  @@map("users")
 }
 
 model OrganizerProfile {
-   id          Int     @id @default(autoincrement())
-   userId      Int     @unique // one-to-one relation with User
-   user        User    @relation(fields: [userId], references: [id])
-   orgName     String
-   description String?
-   contactPhone String?
-   website     String?
-   // Add address fields later if needed
-   // Add ratings relation later
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique
+  user             User     @relation(fields: [userId], references: [id])
+  orgName          String
+  description      String?
+
+  contactEmail     String?
+  website          String?
+  contactPhone     String?
+  imageUrl         String?
+  about            String?
+  yearEstablished  Int?
+
+  street           String?
+  city             String?
+  stateOrProvince  String?
+  postalCode       String?
+  country          String?
+
+  reviews          Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("organizer_profiles")
 }
 
 model Event {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  date        DateTime
-  location    String   // Simple text location for now
-  category    String?  // e.g., Sports, Arts, Education
-  ageGroup    String?  // e.g., 3-5, 6-8, All Ages
-  price       Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  organizerId Int
-  organizer   User     @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String
+  date          DateTime
+  location      String
+  category      String?
+  ageGroup      String?
+  price         Float?   // Optional price field
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  organizerId   Int
+  organizer     User     @relation("OrganizerEvents", fields: [organizerId], references: [id])
+
   registrations Registration[]
+  reviews       Review[]
+
+  @@map("events")
 }
 
 model Registration {
-  id        Int      @id @default(autoincrement())
-  userId    Int      // Parent's user ID
-  user      User     @relation(fields: [userId], references: [id])
-  eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
-  childName String?  // Optional: name of the child attending
-  childAge  Int?     // Optional: age of the child
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  eventId      Int
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  childName    String?
+  childAge     Int?
   registeredAt DateTime @default(now())
 
-  @@unique([userId, eventId]) // A user can register for an event only once
+  @@unique([userId, eventId])
+  @@map("registrations")
+}
+
+model Review {
+  id                 Int      @id @default(autoincrement())
+  rating             Int
+  comment            String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  reviewerId         Int
+  reviewer           User     @relation("UserReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  organizerProfileId Int
+  organizerProfile   OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+
+  eventId            Int?
+  event              Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  @@index([reviewerId])
+  @@index([organizerProfileId])
+  @@index([eventId])
+  @@map("reviews")
 }
 
 enum Role {
   PARENT
   ORGANIZER
-  ADMIN // Optional
+  ADMIN
 }

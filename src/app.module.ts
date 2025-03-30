@@ -10,6 +10,8 @@ import { EventsModule } from './events/events.module';
 import { MailerModule } from '@nestjs-modules/mailer'; // Import MailerModule
 import { join } from 'path'; // For template path
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'; // Example adapter
+import { OrganizersModule } from './organizers/organizers.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     AuthModule,
     UsersModule,
     EventsModule,
+    OrganizersModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
