@@ -1,0 +1,73 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      Role     @default(PARENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Organizer specific fields (can be added later or use a separate profile model)
+  organizerInfo OrganizerProfile?
+  // Parent specific fields (if needed)
+  registrations Registration[]
+  // Events created by this user (if organizer)
+  organizedEvents Event[] @relation("OrganizerEvents")
+
+}
+
+model OrganizerProfile {
+   id          Int     @id @default(autoincrement())
+   userId      Int     @unique // one-to-one relation with User
+   user        User    @relation(fields: [userId], references: [id])
+   orgName     String
+   description String?
+   contactPhone String?
+   website     String?
+   // Add address fields later if needed
+   // Add ratings relation later
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  date        DateTime
+  location    String   // Simple text location for now
+  category    String?  // e.g., Sports, Arts, Education
+  ageGroup    String?  // e.g., 3-5, 6-8, All Ages
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  organizerId Int
+  organizer   User     @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  registrations Registration[]
+}
+
+model Registration {
+  id        Int      @id @default(autoincrement())
+  userId    Int      // Parent's user ID
+  user      User     @relation(fields: [userId], references: [id])
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  childName String?  // Optional: name of the child attending
+  childAge  Int?     // Optional: age of the child
+  registeredAt DateTime @default(now())
+
+  @@unique([userId, eventId]) // A user can register for an event only once
+}
+
+enum Role {
+  PARENT
+  ORGANIZER
+  ADMIN // Optional
+}
