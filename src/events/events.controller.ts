@@ -3,9 +3,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 // Adjust DTO paths if they differ from this structure
-import { CreateEventDto } from '../auth/dto/create-event.dto';
-import { UpdateEventDto } from '../auth/dto/update-event.dto';
-import { FilterEventDto } from '../auth/dto/filter-event.dto';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
+import { FilterEventDto } from './dto/filter-event.dto';
 import { GetUser } from '../auth/decorators/get-user.decorator'; // Custom decorator to get user from request
 import { User } from '@prisma/client';
 

@@ -3,9 +3,9 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 // Make sure the path to PrismaService is correct for your structure
 import { PrismaService } from '../../prisma/prisma.service';
 // Ensure DTO paths are correct
-import { CreateEventDto } from '../auth/dto/create-event.dto'; // Or wherever your DTOs actually are, e.g., './dto/...'
-import { UpdateEventDto } from '../auth/dto/update-event.dto'; // Or wherever your DTOs actually are
-import { FilterEventDto } from '../auth/dto/filter-event.dto'; // Or wherever your DTOs actually are
+import { CreateEventDto } from './dto/create-event.dto'; // Or wherever your DTOs actually are, e.g., './dto/...'
+import { UpdateEventDto } from './dto/update-event.dto'; // Or wherever your DTOs actually are
+import { FilterEventDto } from './dto/filter-event.dto'; // Or wherever your DTOs actually are
 import { Prisma, Role, User } from '@prisma/client';
 import { MailerService } from '@nestjs-modules/mailer'; // <--- Import MailerService
 import { format } from 'date-fns'; // <--- Import date-fns for formatting
