@@ -1,5 +1,5 @@
 // src/events/dto/create-event.dto.ts
-import { IsString, IsNotEmpty, IsDateString, IsOptional, MinLength, IsISO8601 } from 'class-validator';
+import { IsString, IsNotEmpty, IsDateString, IsOptional, MinLength, IsISO8601, IsNumber, Min, IsPositive } from 'class-validator';
 
 export class CreateEventDto {
   @IsString()
@@ -26,6 +26,11 @@ export class CreateEventDto {
   @IsString()
   @IsOptional()
   ageGroup?: string;
+
+  @IsNumber({ maxDecimalPlaces: 2 }) 
+  @Min(0) 
+  @IsOptional() 
+  price?: number; // Prisma Float maps to number in TS
 
   // organizerId is added by the service based on the authenticated user
 }

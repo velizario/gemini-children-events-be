@@ -46,6 +46,7 @@ model Event {
   location    String   // Simple text location for now
   category    String?  // e.g., Sports, Arts, Education
   ageGroup    String?  // e.g., 3-5, 6-8, All Ages
+  price       Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   organizerId Int
